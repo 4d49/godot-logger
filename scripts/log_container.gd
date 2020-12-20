@@ -1,6 +1,7 @@
 # Copyright © 2020 Mansur Isaev and contributors - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
+tool
 extends VBoxContainer
 
 
@@ -8,17 +9,19 @@ signal show_log() # Call if autoopen is enabled.
 
 
 const MESSAGE = preload("log_message.gd")
-const MESSAGE_LEVEL = MESSAGE.Level
+
+const MESSAGE_TAG = Log.MESSAGE_TAG
+const MESSAGE_FORMAT = "[{time}][{tag}]{text}"
 
 const LEVEL_COLOR = {
-	MESSAGE_LEVEL.INFO: Color.white,
-	MESSAGE_LEVEL.DEBUG: Color.gray,
-	MESSAGE_LEVEL.WARNING: Color.darkorange,
-	MESSAGE_LEVEL.ERROR: Color.red,
+	Log.INFO: Color.white,
+	Log.DEBUG: Color.gray,
+	Log.WARNING: Color.darkorange,
+	Log.ERROR: Color.red,
 	}
 
 
-export(bool) var auto_open : bool = true
+export(bool) var auto_open : bool = true # Used only in init.
 
 
 var _log_output : RichTextLabel
@@ -58,10 +61,33 @@ func _ready() -> void:
 	return
 
 
+func get_message_color(level: int) -> Color:
+	return LEVEL_COLOR[level]
+
+
+func _message_to_text(message: MESSAGE) -> String:
+	if message.has_tag():
+		return MESSAGE_FORMAT.format(
+			{
+				"time": message.get_time(),
+				"tag" : message.get_tag(),
+				"text": message.get_text(),
+			}
+		)
+	
+	return MESSAGE_FORMAT.format(
+		{
+			"time": message.get_time(),
+			"tag" : MESSAGE_TAG[message.get_level()],
+			"text": message.get_text(),
+		}
+	)
+
+
 func _on_log_message(message: MESSAGE) -> void:
 	_log_output.newline()
-	_log_output.push_color(LEVEL_COLOR[message.get_level()])
-	_log_output.add_text(message.to_string())
+	_log_output.push_color(get_message_color(message.get_level()))
+	_log_output.add_text(_message_to_text(message))
 	
 	if _open_check.pressed:
 		emit_signal("show_log")

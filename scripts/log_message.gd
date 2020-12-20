@@ -3,24 +3,8 @@
 
 extends Reference
 
-# Levels for message.
-enum Level {
-	INFO,
-	DEBUG,
-	WARNING,
-	ERROR,
-	}
-
-# Tags for the level.
-const LEVEL_TAG = {
-	Level.INFO:    "INFO",
-	Level.DEBUG:   "DEBUG",
-	Level.WARNING: "WARNING",
-	Level.ERROR:   "ERROR",
-	}
 
 const FORMAT_TIME   = "{hour}:{minute}:{second}"
-const FORMAT_STRING = "[{time}] [{tag}] {text}"
 
 
 var _level : int
@@ -38,13 +22,7 @@ func _init(level: int, text: String, tag: String = "") -> void:
 
 
 func _to_string() -> String:
-	return FORMAT_STRING.format(
-		{
-			"time": get_time(),
-			"tag": get_tag(),
-			"text": get_text()
-		}
-	)
+	return "[Message:%s]" % get_text()
 
 
 func get_level() -> int:
@@ -53,6 +31,10 @@ func get_level() -> int:
 
 func get_text() -> String:
 	return _text
+
+
+func has_tag() -> bool:
+	return not _tag.empty()
 
 
 func get_tag() -> String:
@@ -64,21 +46,17 @@ func get_time() -> String:
 
 
 func _set_level(level: int) -> void:
-	assert(LEVEL_TAG.has(level), "Invalid level.")
 	_level = level
 	return
 
 
 func _set_text(text: String) -> void:
-	assert(not text.empty(), "Empty text.")
+	assert(text, "Empty text.")
 	_text = text
 	return
 
 
 func _set_tag(tag: String) -> void:
-	if tag.empty():
-		tag = LEVEL_TAG[get_level()]
-	
 	_tag = tag
 	return
 
