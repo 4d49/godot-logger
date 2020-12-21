@@ -8,6 +8,8 @@ Simple in-game logger for Godot 3.2.
 - Installed as plugin.
 - Singletone Log.
 - Write to log file.
+- Disable log levels.
+- Custom log levels.
 
 # Installation:
 1. Clone or download this project to `addons/godot-log` folder.
@@ -16,34 +18,36 @@ Simple in-game logger for Godot 3.2.
 4. Profit.
 
 # Usage:
-## Calling methods without a tag:
+## Calling default levels:
 ```gdscript
-func _ready() -> void:
-	Log.info(text)
-	Log.debug(text)
-	Log.warning(text)
-	Log.error(text)
+Log.info(text)
+Log.debug(text)
+Log.warning(text)
+Log.error(text)
+Log.fatal(text)
 ```
 
-## Calling methods with a tag:
+## Create a custom log level:
 ```gdscript
+const CUSTOM = 1<<6 # Level integer.
+
 func _ready() -> void:
-	Log.info(text, tag)
-	Log.debug(text, tag)
-	Log.warning(text, tag)
-	Log.error(text, tag)
+	Log.add_level(CUSTOM, "CUSTOM")
 ```
 
-## Calling methods with a custom bit mask:
+## Calling a custom level:
 ```gdscript
-func _ready() -> void:
-	Log.message(text, CUSTOM_BIT, tag)
+Log.message(CUSTOM, "Something happened")
 ```
 
 ## Disable log level:
 ```gdscript
-func _ready() -> void:
-	Log.set_level_bit(Log.INFO, false)
+Log.set_level(Log.INFO, false)
+```
+
+## Enable log level:
+```gdscript
+Log.set_level(Log.INFO, true)
 ```
 
 ## License
