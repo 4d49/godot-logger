@@ -8,27 +8,42 @@ extends Node
 signal message(message)
 
 
+const PROJECT_SETTINGS = "editor_plugins/log/"
+const PROJECT_SETTINGS_LOG_ENABLED = PROJECT_SETTINGS + "log_enabled"
+const PROJECT_SETTINGS_FILE_WRTITE = PROJECT_SETTINGS + "file/log_file_write"
+const PROJECT_SETTINGS_STDOUT = PROJECT_SETTINGS + "log_stdout"
+
+const PROJECT_SETTINGS_FILE_PATH = PROJECT_SETTINGS + "file/file_path"
+const PROJECT_SETTINGS_FILE_PATH_DEFAULT = "res://game.log"
+
+const PROJECT_SETTINGS_LEVEL = PROJECT_SETTINGS + "level"
+
+const PROJECT_SETTINGS_FORMAT_TIME = PROJECT_SETTINGS + "format/time"
+const PROJECT_SETTINGS_FORMAT_TIME_DEFAULT = "{hour}:{minute}:{second}"
+
+const PROJECT_SETTINGS_FORMAT_TEXT = PROJECT_SETTINGS + "format/message"
+const PROJECT_SETTINGS_FORMAT_TEXT_DEFAULT = "[{time}][{level}]{text}"
+
 const MESSAGE = preload("log_message.gd")
 
-const DEFAULT_PATH = "res://log.txt"
-
-const INFO    = 1<<1
-const DEBUG   = 1<<2
-const WARNING = 1<<3
-const ERROR   = 1<<4
-const FATAL   = 1<<5
+const INFO    = 1
+const DEBUG   = 1<<1
+const WARNING = 1<<2
+const ERROR   = 1<<3
+const FATAL   = 1<<4
 
 # Bitmask level of logger messages.
-var _level : int = INFO | DEBUG | WARNING | ERROR | FATAL
+var _level : int
 
 var _enabled_log        : bool = false
 var _enabled_stdout     : bool = false
 var _enabled_file_write : bool = false
 
 var _file : File
+var _file_path : String
 
-var _format_time : String = "{hour}:{minute}:{second}"
-var _format_text : String = "[{time}][{level}]{text}"
+var _format_time : String
+var _format_text : String
 
 var _level_name = {
 	INFO: "INFO",
@@ -38,10 +53,35 @@ var _level_name = {
 	FATAL: "FATAL"
 }
 
+
+func _init_setting(setting: String, value):
+	if ProjectSettings.has_setting(setting):
+		return ProjectSettings.get_setting(setting)
+	
+	ProjectSettings.set_setting(setting, value)
+	return value
+
+
 func _ready() -> void:
-	set_enabled_log(true)
-	set_enabled_file_write(true)
-	set_enabled_stdout(true)
+	set_enabled_log(_init_setting(PROJECT_SETTINGS_LOG_ENABLED, true))
+	set_enabled_stdout(_init_setting(PROJECT_SETTINGS_STDOUT, true))
+	
+	_level = _init_setting(PROJECT_SETTINGS_LEVEL, INFO | DEBUG | WARNING | ERROR | FATAL)
+	ProjectSettings.add_property_info(
+		{
+			"name": PROJECT_SETTINGS_LEVEL,
+			"type": TYPE_INT,
+			"hint": PROPERTY_HINT_FLAGS,
+			"hint_string": "Info,Debug,Warning,Error,Fatal",
+			}
+		)
+	
+	_file_path = _init_setting(PROJECT_SETTINGS_FILE_PATH, PROJECT_SETTINGS_FILE_PATH_DEFAULT)
+	set_enabled_file_write(_init_setting(PROJECT_SETTINGS_FILE_WRTITE, true))
+	
+	_format_time = _init_setting(PROJECT_SETTINGS_FORMAT_TIME, PROJECT_SETTINGS_FORMAT_TIME_DEFAULT)
+	_format_text = _init_setting(PROJECT_SETTINGS_FORMAT_TEXT, PROJECT_SETTINGS_FORMAT_TEXT_DEFAULT)
+	
 	return
 
 # Set the filtering level.
@@ -50,6 +90,7 @@ func set_level(level: int, value: bool) -> void:
 		_level |= level
 	else:
 		_level &= ~level
+	return
 
 
 func get_level() -> int:
@@ -93,20 +134,11 @@ func set_enabled_file_write(value: bool) -> void:
 		_open_file()
 	else:
 		_close_file()
+	return
 
 
 func is_enabled_file_write() -> bool:
 	return _enabled_file_write
-
-
-func set_format_time(format: String) -> void:
-	_format_time = format
-	return
-
-
-func set_format_text(format: String) -> void:
-	_format_text = format
-	return
 
 # Create a info message.
 func info(text: String) -> void:
@@ -151,17 +183,20 @@ func message(level: int, text: String) -> void:
 	return
 
 
-func format(message: MESSAGE) -> String:
-	var time = message.get_time()
+func format_time(time: Dictionary) -> String:
+	return _format_time.format(
+		{
+			"hour":"%02d" % time.hour,
+			"minute":"%02d" % time.minute,
+			"second":"%02d" % time.second,
+		}
+	)
+
+
+func format_message(message: MESSAGE) -> String:
 	return _format_text.format(
 		{
-			"time": _format_time.format(
-				{
-					"hour":  "%02d" % time.hour,
-					"minute":"%02d" % time.minute,
-					"second":"%02d" % time.second,
-				}
-			),
+			"time": format_time(message.get_time()),
 			"level": get_level_name(message.get_level()),
 			"text": message.get_text(),
 		}
@@ -173,7 +208,7 @@ func _create_message(level: int, text: String) -> void:
 		var message = MESSAGE.new(level, text, OS.get_time())
 		emit_signal("message", message)
 		
-		var string = format(message)
+		var string = format_message(message)
 		if is_enabled_stdout():
 			print(string)
 		
@@ -183,12 +218,14 @@ func _create_message(level: int, text: String) -> void:
 	return
 
 
-func _open_file() -> int:
+func _open_file() -> void:
 	if _file:
 		_file.close()
 	
 	_file = File.new()
-	return _file.open(DEFAULT_PATH, File.WRITE)
+	var error = _file.open(_file_path, File.WRITE)
+	assert(error == OK, "Can't open file")
+	return
 
 
 func _close_file() -> void:

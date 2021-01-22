@@ -13,7 +13,6 @@ func _init(level: int, text: String, time: Dictionary) -> void:
 	self._set_level(level)
 	self._set_text(text)
 	self._set_time(time)
-	
 	return
 
 
@@ -39,7 +38,7 @@ func _set_level(level: int) -> void:
 
 
 func _set_text(text: String) -> void:
-	assert(text, "Empty text.")
+	assert(text, "Invalid text.")
 	_text = text
 	return
 

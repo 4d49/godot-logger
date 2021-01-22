@@ -8,9 +8,9 @@ extends EditorPlugin
 const AUTOLOAD_LOG_NAME = "Log"
 const AUTOLOAD_LOG_PATH = "res://addons/godot-log/scripts/log.gd"
 
-const LOG_CONTAINER_NAME = "LogContainer"
+const LOG_CONTAINER_NAME   = "LogContainer"
 const LOG_CONTAINER_SCRIPT = "res://addons/godot-log/scripts/log_container.gd"
-const LOG_CONTAINER_ICON = "res://addons/godot-log/icons/log_icon.svg"
+const LOG_CONTAINER_ICON   = "res://addons/godot-log/icons/log_icon.svg"
 
 
 func _enter_tree() -> void:

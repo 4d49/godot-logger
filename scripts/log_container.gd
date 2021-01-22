@@ -58,7 +58,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	Log.connect("message", self, "_on_log_message")
+	Log.connect("message", self, "print_message")
 	return
 
 
@@ -86,7 +86,7 @@ func format(message: MESSAGE) -> String:
 	)
 
 
-func _on_log_message(message: MESSAGE) -> void:
+func print_message(message: MESSAGE) -> void:
 	_log_output.newline()
 	_log_output.push_color(get_message_color(message.get_level()))
 	_log_output.add_text(format(message))
