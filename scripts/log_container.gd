@@ -8,9 +8,6 @@ extends VBoxContainer
 signal show_log() # Call if autoopen is enabled.
 
 
-const MESSAGE = preload("log_message.gd")
-
-
 export(bool) var auto_open : bool = true # Used only in init.
 
 export(String) var format_time : String = "{hour}:{minute}:{second}"
@@ -69,26 +66,25 @@ func get_message_color(level: int) -> Color:
 	return Color.white
 
 
-func format(message: MESSAGE) -> String:
-	var time = message.get_time()
+func format(message: Dictionary) -> String:
 	return format_text.format(
 		{
 			"time": format_time.format(
 				{
-					"hour":  "%02d" % time.hour,
-					"minute":"%02d" % time.minute,
-					"second":"%02d" % time.second,
+					"hour":  "%02d" % message.hour,
+					"minute":"%02d" % message.minute,
+					"second":"%02d" % message.second,
 				}
 			),
-			"level": Log.get_level_name(message.get_level()),
-			"text": message.get_text(),
+			"level": Log.get_level_name(message.level),
+			"text": message.text,
 		}
 	)
 
 
-func print_message(message: MESSAGE) -> void:
+func print_message(message: Dictionary) -> void:
 	_log_output.newline()
-	_log_output.push_color(get_message_color(message.get_level()))
+	_log_output.push_color(get_message_color(message.level))
 	_log_output.add_text(format(message))
 	
 	if _open_check.pressed:

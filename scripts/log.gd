@@ -24,8 +24,6 @@ const PROJECT_SETTINGS_FORMAT_TIME_DEFAULT = "{hour}:{minute}:{second}"
 const PROJECT_SETTINGS_FORMAT_TEXT = PROJECT_SETTINGS + "format/message"
 const PROJECT_SETTINGS_FORMAT_TEXT_DEFAULT = "[{time}][{level}]{text}"
 
-const MESSAGE = preload("log_message.gd")
-
 const INFO    = 1
 const DEBUG   = 1<<1
 const WARNING = 1<<2
@@ -100,6 +98,7 @@ func get_level() -> int:
 func add_level(level: int, name: String) -> void:
 	assert(not _level_name.has(level), "Log has '%s' level" % level)
 	assert(name, "Invalid level name")
+	
 	_level_name[level] = name
 	# Enable custom level.
 	set_level(level, true)
@@ -183,29 +182,33 @@ func message(level: int, text: String) -> void:
 	return
 
 
-func format_time(time: Dictionary) -> String:
+func format_time(message: Dictionary) -> String:
 	return _format_time.format(
 		{
-			"hour":"%02d" % time.hour,
-			"minute":"%02d" % time.minute,
-			"second":"%02d" % time.second,
+			"hour":"%02d" % message.hour,
+			"minute":"%02d" % message.minute,
+			"second":"%02d" % message.second,
 		}
 	)
 
 
-func format_message(message: MESSAGE) -> String:
+func format_message(message: Dictionary) -> String:
 	return _format_text.format(
 		{
-			"time": format_time(message.get_time()),
-			"level": get_level_name(message.get_level()),
-			"text": message.get_text(),
+			"time": format_time(message),
+			"level": get_level_name(message.level),
+			"text": message.text,
 		}
 	)
 
 
 func _create_message(level: int, text: String) -> void:
+	assert(text, "Invalid Message")
 	if is_enabled_log():
-		var message = MESSAGE.new(level, text, OS.get_time())
+		var message = OS.get_time()
+		message["level"] = level
+		message["text"] = text
+		
 		emit_signal("message", message)
 		
 		var string = format_message(message)
