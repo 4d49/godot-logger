@@ -83,9 +83,9 @@ func format(message: Dictionary) -> String:
 
 
 func print_message(message: Dictionary) -> void:
-	_log_output.newline()
 	_log_output.push_color(get_message_color(message.level))
 	_log_output.add_text(format(message))
+	_log_output.newline()
 	
 	if _open_check.pressed:
 		emit_signal("show_log")
