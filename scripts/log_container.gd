@@ -8,7 +8,7 @@ extends VBoxContainer
 signal show_log() # Call if autoopen is enabled.
 
 
-export(bool) var auto_open : bool = true # Used only in init.
+export(bool) var auto_open : bool = true setget set_autoopen, is_autoopen
 
 export(String) var format_time : String = "{hour}:{minute}:{second}"
 export(String) var format_text : String = "[{time}][{level}]{text}"
@@ -51,12 +51,17 @@ func _init() -> void:
 	btn_clear.connect("pressed", _log_output, "clear")
 	btn_box.add_child(btn_clear)
 	
-	return
-
-
-func _ready() -> void:
 	Log.connect("message", self, "print_message")
 	return
+
+
+func set_autoopen(value: bool) -> void:
+	_open_check.pressed = value
+	return
+
+
+func is_autoopen() -> bool:
+	return _open_check.pressed
 
 
 func get_message_color(level: int) -> Color:
@@ -87,7 +92,7 @@ func print_message(message: Dictionary) -> void:
 	_log_output.add_text(format(message))
 	_log_output.newline()
 	
-	if _open_check.pressed:
+	if is_autoopen():
 		emit_signal("show_log")
 	
 	return
