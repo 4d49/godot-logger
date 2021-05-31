@@ -8,6 +8,7 @@ extends VBoxContainer
 signal show_log() # Call if autoopen is enabled.
 
 
+export(bool) var bottom_visible : bool = true setget set_bottom_visible, is_bottom_visible
 export(bool) var auto_open : bool = true setget set_autoopen, is_autoopen
 
 export(String) var format_time : String = "{hour}:{minute}:{second}"
@@ -23,6 +24,7 @@ export(Dictionary) var colors : Dictionary = {
 
 
 var _log_output : RichTextLabel
+var _bottom_bar : HBoxContainer
 var _open_check : CheckBox
 
 
@@ -34,25 +36,37 @@ func _init() -> void:
 	_log_output.scroll_following = true
 	self.add_child(_log_output)
 	
-	var btn_box = HBoxContainer.new()
-	self.add_child(btn_box)
+	_bottom_bar = HBoxContainer.new()
+	_bottom_bar.size_flags_horizontal = SIZE_EXPAND_FILL
+	_bottom_bar.visible = bottom_visible
+	self.add_child(_bottom_bar)
 	
 	var btn_spacer = Control.new()
 	btn_spacer.size_flags_horizontal = SIZE_EXPAND_FILL
-	btn_box.add_child(btn_spacer)
+	_bottom_bar.add_child(btn_spacer)
 	
 	_open_check = CheckBox.new()
 	_open_check.text = "Auto open"
 	_open_check.pressed = auto_open
-	btn_box.add_child(_open_check)
+	_open_check.connect("toggled", self, "set_autoopen")
+	_bottom_bar.add_child(_open_check)
 	
 	var btn_clear = Button.new()
 	btn_clear.text = "Clear"
 	btn_clear.connect("pressed", _log_output, "clear")
-	btn_box.add_child(btn_clear)
+	_bottom_bar.add_child(btn_clear)
 	
 	Log.connect("message", self, "print_message")
 	return
+
+
+func set_bottom_visible(value: bool) -> void:
+	_bottom_bar.visible = value
+	return
+
+
+func is_bottom_visible() -> bool:
+	return _bottom_bar.visible
 
 
 func set_autoopen(value: bool) -> void:
