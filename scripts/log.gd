@@ -149,84 +149,65 @@ func is_enabled_file_write() -> bool:
 
 # Create a info message.
 func info(text: String) -> void:
-	if get_level() & INFO:
-		_create_message(INFO, text)
-	
+	message(INFO, text)
 	return
 
 # Create a debug message.
 func debug(text: String) -> void:
-	if OS.is_debug_build() and get_level() & DEBUG:
-		_create_message(DEBUG, text)
-	
+	if OS.is_debug_build():
+		message(DEBUG, text)
 	return
 
 # Create a warning message.
 func warning(text: String) -> void:
-	if get_level() & WARNING:
-		_create_message(WARNING, text)
-	
+	message(WARNING, text)
 	return
 
 # Create a error message.
 func error(text: String) -> void:
-	if get_level() & ERROR:
-		_create_message(ERROR, text)
-	
+	message(ERROR, text)
 	return
 
 # Create a fatal error message.
 func fatal(text: String) -> void:
-	if get_level() & FATAL:
-		_create_message(FATAL, text)
-	
+	message(FATAL, text)
 	return
 
 # Create a message with custom level.
 func message(level: int, text: String) -> void:
-	if get_level() & level:
-		_create_message(level, text)
-	
-	return
-
-
-func format_time(message: Dictionary) -> String:
-	return _format_time.format(
-		{
-			"hour":"%02d" % message.hour,
-			"minute":"%02d" % message.minute,
-			"second":"%02d" % message.second,
-		}
-	)
-
-
-func format_message(message: Dictionary) -> String:
-	return _format_text.format(
-		{
-			"time": format_time(message),
-			"level": get_level_name(message.level),
-			"text": message.text,
-		}
-	)
-
-
-func _create_message(level: int, text: String) -> void:
 	assert(text, "Invalid Message")
-	if is_enabled_log():
+	if _enabled_log and _level & level:
 		var message = OS.get_time()
 		message["level"] = level
 		message["text"] = text
 		
 		emit_signal("message", message)
 		
-		var string = format_message(message)
-		if is_enabled_stdout():
-			print(string)
-		
-		if is_enabled_file_write():
-			_file.store_line(string)
+		if _enabled_stdout or _enabled_file_write:
+			var string = format_message(message)
+			if _enabled_stdout:
+				print(string)
+			
+			if _enabled_file_write:
+				_file.store_line(string)
 	
 	return
+
+
+func format_message(message: Dictionary) -> String:
+	return _format_text.format(
+		{
+			"time": _format_time.format(
+				{
+					"hour": "%02d" % message.hour,
+					"minute":"%02d" % message.minute,
+					"second":"%02d" % message.second,
+				}
+			),
+			"level": _level_name[message.level],
+			"text": message.text,
+		}
+	)
 
 
 func _open_file() -> void:
