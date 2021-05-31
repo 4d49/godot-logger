@@ -95,9 +95,16 @@ func get_level() -> int:
 	return _level
 
 
+func has_level(level: int) -> bool:
+	return _level_name.has(level)
+
+
 func add_level(level: int, name: String) -> void:
-	assert(not _level_name.has(level), "Log has '%s' level" % level)
 	assert(name, "Invalid level name")
+	
+	if has_level(level):
+		assert(false, "Log has '%s' level" % level)
+		return
 	
 	_level_name[level] = name
 	# Enable custom level.
