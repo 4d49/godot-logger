@@ -60,7 +60,7 @@ func _init_setting(setting: String, value):
 	return value
 
 
-func _ready() -> void:
+func _init() -> void:
 	set_enabled_log(_init_setting(PROJECT_SETTINGS_LOG_ENABLED, true))
 	set_enabled_stdout(_init_setting(PROJECT_SETTINGS_STDOUT, true))
 	
@@ -88,6 +88,7 @@ func set_level(level: int, value: bool) -> void:
 		_level |= level
 	else:
 		_level &= ~level
+	
 	return
 
 
