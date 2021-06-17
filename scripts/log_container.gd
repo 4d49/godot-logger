@@ -48,6 +48,7 @@ func _init() -> void:
 	_open_check = CheckBox.new()
 	_open_check.text = "Auto open"
 	_open_check.pressed = auto_open
+	# warning-ignore:return_value_discarded
 	_open_check.connect("toggled", self, "set_autoopen")
 	_bottom_bar.add_child(_open_check)
 	
@@ -56,7 +57,8 @@ func _init() -> void:
 	btn_clear.connect("pressed", _log_output, "clear")
 	_bottom_bar.add_child(btn_clear)
 	
-	Log.connect("message", self, "print_message")
+	# warning-ignore:return_value_discarded
+	Log.connect("message", self, "handle_message")
 	return
 
 
@@ -101,7 +103,7 @@ func format(message: Dictionary) -> String:
 	)
 
 
-func print_message(message: Dictionary) -> void:
+func handle_message(message: Dictionary) -> void:
 	_log_output.push_color(get_message_color(message.level))
 	_log_output.add_text(format(message))
 	_log_output.newline()
