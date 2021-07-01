@@ -11,8 +11,7 @@ signal show_log() # Call if autoopen is enabled.
 export(bool) var bottom_visible : bool = true setget set_bottom_visible, is_bottom_visible
 export(bool) var auto_open : bool = true setget set_autoopen, is_autoopen
 
-export(String) var format_time : String = "{hour}:{minute}:{second}"
-export(String) var format_text : String = "[{time}][{level}]{text}"
+export(String) var format_text : String = "[{hour}:{minute}:{second}][{level}]{text}"
 
 export(Dictionary) var colors : Dictionary = {
 	Log.INFO: Color.white,
@@ -90,13 +89,9 @@ func get_message_color(level: int) -> Color:
 func format(message: Dictionary) -> String:
 	return format_text.format(
 		{
-			"time": format_time.format(
-				{
-					"hour":  "%02d" % message.hour,
-					"minute":"%02d" % message.minute,
-					"second":"%02d" % message.second,
-				}
-			),
+			"hour": "%02d" % message.hour,
+			"minute": "%02d" % message.minute,
+			"second": "%02d" % message.second,
 			"level": Log.get_level_name(message.level),
 			"text": message.text,
 		}

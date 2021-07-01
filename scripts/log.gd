@@ -18,11 +18,8 @@ const PROJECT_SETTINGS_FILE_PATH_DEFAULT = "res://game.log"
 
 const PROJECT_SETTINGS_LEVEL = PROJECT_SETTINGS + "level"
 
-const PROJECT_SETTINGS_FORMAT_TIME = PROJECT_SETTINGS + "format/time"
-const PROJECT_SETTINGS_FORMAT_TIME_DEFAULT = "{hour}:{minute}:{second}"
-
-const PROJECT_SETTINGS_FORMAT_TEXT = PROJECT_SETTINGS + "format/message"
-const PROJECT_SETTINGS_FORMAT_TEXT_DEFAULT = "[{time}][{level}]{text}"
+const PROJECT_SETTINGS_FORMAT_TEXT = PROJECT_SETTINGS + "format"
+const PROJECT_SETTINGS_FORMAT_TEXT_DEFAULT = "[{hour}:{minute}:{second}][{level}]{text}"
 
 const INFO    = 1
 const DEBUG   = 1<<1
@@ -77,7 +74,7 @@ func _init() -> void:
 	_file_path = _init_setting(PROJECT_SETTINGS_FILE_PATH, PROJECT_SETTINGS_FILE_PATH_DEFAULT)
 	set_enabled_file_write(_init_setting(PROJECT_SETTINGS_FILE_WRTITE, true))
 	
-	_format_time = _init_setting(PROJECT_SETTINGS_FORMAT_TIME, PROJECT_SETTINGS_FORMAT_TIME_DEFAULT)
+#	_format_time = _init_setting(PROJECT_SETTINGS_FORMAT_TIME, PROJECT_SETTINGS_FORMAT_TIME_DEFAULT)
 	_format_text = _init_setting(PROJECT_SETTINGS_FORMAT_TEXT, PROJECT_SETTINGS_FORMAT_TEXT_DEFAULT)
 	
 	return
@@ -197,13 +194,9 @@ func message(level: int, text: String) -> void:
 func format_message(message: Dictionary) -> String:
 	return _format_text.format(
 		{
-			"time": _format_time.format(
-				{
-					"hour": "%02d" % message.hour,
-					"minute":"%02d" % message.minute,
-					"second":"%02d" % message.second,
-				}
-			),
+			"hour": "%02d" % message.hour,
+			"minute":"%02d" % message.minute,
+			"second":"%02d" % message.second,
 			"level": _level_name[message.level],
 			"text": message.text,
 		}
