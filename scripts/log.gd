@@ -59,7 +59,7 @@ func _init_setting(setting: String, value):
 
 func _init() -> void:
 	set_enabled_log(_init_setting(PROJECT_SETTINGS_LOG_ENABLED, true))
-	set_enabled_stdout(_init_setting(PROJECT_SETTINGS_STDOUT, true))
+	set_enabled_stdout(_init_setting(PROJECT_SETTINGS_STDOUT, false))
 	
 	_level = _init_setting(PROJECT_SETTINGS_LEVEL, INFO | DEBUG | WARNING | ERROR | FATAL)
 	ProjectSettings.add_property_info(
@@ -74,7 +74,6 @@ func _init() -> void:
 	_file_path = _init_setting(PROJECT_SETTINGS_FILE_PATH, PROJECT_SETTINGS_FILE_PATH_DEFAULT)
 	set_enabled_file_write(_init_setting(PROJECT_SETTINGS_FILE_WRTITE, true))
 	
-#	_format_time = _init_setting(PROJECT_SETTINGS_FORMAT_TIME, PROJECT_SETTINGS_FORMAT_TIME_DEFAULT)
 	_format_text = _init_setting(PROJECT_SETTINGS_FORMAT_TEXT, PROJECT_SETTINGS_FORMAT_TEXT_DEFAULT)
 	
 	return
@@ -180,7 +179,7 @@ func message(level: int, text: String) -> void:
 		
 		emit_signal("message", message)
 		
-		if _enabled_stdout or _enabled_file_write:
+		if _enabled_file_write or _enabled_stdout:
 			var string = format_message(message)
 			if _enabled_stdout:
 				print(string)
