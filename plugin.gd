@@ -1,25 +1,23 @@
-# Copyright © 2020 Mansur Isaev and contributors - MIT License
+# Copyright (c) 2020-2021 Mansur Isaev and contributors - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
-tool
+@tool
 extends EditorPlugin
 
 
-const AUTOLOAD_LOG_NAME = "Log"
-const AUTOLOAD_LOG_PATH = "res://addons/godot-log/scripts/log.gd"
+const AUTOLOAD_NAME = "Log"
+const AUTOLOAD_PATH = "res://addons/godot-log/scripts/logger.gd"
 
-const LOG_CONTAINER_NAME   = "LogContainer"
-const LOG_CONTAINER_SCRIPT = "res://addons/godot-log/scripts/log_container.gd"
-const LOG_CONTAINER_ICON   = "res://addons/godot-log/icons/log_icon.svg"
+const LOGGER_OUTPUT = "LoggerOutput"
+const LOGGER_OUTPUT_SCRIPT = "res://addons/godot-log/scripts/logger_output.gd"
+const LOGGER_OUTPUT_ICON = "res://addons/godot-log/icons/logger.svg"
 
 
 func _enter_tree() -> void:
-	add_autoload_singleton(AUTOLOAD_LOG_NAME, AUTOLOAD_LOG_PATH)
-	add_custom_type(LOG_CONTAINER_NAME, "VBoxContainer", load(LOG_CONTAINER_SCRIPT), load(LOG_CONTAINER_ICON))
-	return
+	add_autoload_singleton(AUTOLOAD_NAME, AUTOLOAD_PATH)
+	add_custom_type(LOGGER_OUTPUT, "RichTextLabel", load(LOGGER_OUTPUT_SCRIPT), load(LOGGER_OUTPUT_ICON))
 
 
 func _exit_tree() -> void:
-	remove_autoload_singleton(AUTOLOAD_LOG_NAME)
-	remove_custom_type(LOG_CONTAINER_NAME)
-	return
+	remove_custom_type(LOGGER_OUTPUT)
+	remove_autoload_singleton(AUTOLOAD_NAME)

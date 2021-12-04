@@ -1,8 +1,8 @@
 # Godot-Log
 
-Simple in-game logger for Godot 3.2.
+Simple in-game logger for Godot 4.0.
 
-![](https://i.imgur.com/LToP4Jg.png)
+![](https://user-images.githubusercontent.com/8208165/144706770-e4fda4c0-249b-4851-b7a8-8d0bc3d278bc.png)
 
 # Features
 - Installed as plugin.
@@ -12,9 +12,9 @@ Simple in-game logger for Godot 3.2.
 - Custom log levels.
 
 # Installation:
-1. Clone or download this project to `addons/godot-log` folder.
+1. Clone or download this repository to `addons` folder.
 2. Enable `Godot Log` in Plugins.
-3. Add `LogContainer` node to the scene.
+3. Add `LogOutput` node to the scene.
 4. Profit.
 
 # Usage:
@@ -29,15 +29,15 @@ Log.fatal(text)
 
 ## Create a custom log level:
 ```gdscript
-const LOG_AI = Log.FATAL << 1 # Increase the value for a custom level.
+const CUSTOM = Log.MAX << 1 # Bitwise left shift the MAX value for a custom level.
 
 func _ready() -> void:
-	Log.add_level(LOG_AI, "AI")
+	Log.add_level(CUSTOM, "CUSTOM")
 ```
 
 ## Calling the custom level:
 ```gdscript
-Log.message(LOG_AI, "Something happened")
+Log.message(CUSTOM, "Something happened")
 ```
 
 ## Disable log level:
@@ -51,7 +51,7 @@ Log.set_level(Log.DEBUG, true)
 ```
 
 # License
-Copyright © 2020 Mansur Isaev and contributors
+Copyright (c) 2020-2021 Mansur Isaev and contributors
 
 Unless otherwise specified, files in this repository are licensed under the
 MIT license. See [LICENSE.md](LICENSE.md) for more information.
