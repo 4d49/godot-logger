@@ -6,11 +6,11 @@ extends EditorPlugin
 
 
 const AUTOLOAD_NAME = "Log"
-const AUTOLOAD_PATH = "res://addons/godot-log/scripts/logger.gd"
+const AUTOLOAD_PATH = "res://addons/godot-logger/scripts/logger.gd"
 
 const LOGGER_OUTPUT = "LoggerOutput"
-const LOGGER_OUTPUT_SCRIPT = "res://addons/godot-log/scripts/logger_output.gd"
-const LOGGER_OUTPUT_ICON = "res://addons/godot-log/icons/logger.svg"
+const LOGGER_OUTPUT_SCRIPT = "res://addons/godot-logger/scripts/logger_output.gd"
+const LOGGER_OUTPUT_ICON = "res://addons/godot-logger/icons/logger.svg"
 
 
 func _enter_tree() -> void:
