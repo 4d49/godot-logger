@@ -1,8 +1,9 @@
-# Copyright (c) 2020-2021 Mansur Isaev and contributors - MIT License
+# Copyright (c) 2020-2022 Mansur Isaev and contributors - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
+@tool
 ## LoggerOutput class.
-#class_name LoggerOutput
+class_name LoggerOutput
 extends RichTextLabel
 
 ## Emited when handle [signal Logger.logged] signal.

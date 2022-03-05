@@ -51,7 +51,7 @@ Log.set_level(Log.DEBUG, true)
 ```
 
 # License
-Copyright (c) 2020-2021 Mansur Isaev and contributors
+Copyright (c) 2020-2022 Mansur Isaev and contributors
 
 Unless otherwise specified, files in this repository are licensed under the
 MIT license. See [LICENSE.md](LICENSE.md) for more information.
