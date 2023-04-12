@@ -1,7 +1,6 @@
-# Copyright (c) 2020-2022 Mansur Isaev and contributors - MIT License
+# Copyright (c) 2020-2023 Mansur Isaev and contributors - MIT License
 # See `LICENSE.md` included in the source distribution for details.
 
-@tool
 ## Logger class.
 class_name Logger
 extends Node
@@ -23,13 +22,13 @@ enum {
 var _level : int
 
 var _log_enabled : bool
-var _stdout_enabled : bool
+var _default_output_enabled : bool
 var _file_write_enabled : bool
 
-var _file : File
+var _file : FileAccess
 var _file_path : String
 
-var _format_stdout : String
+var _format_default_output : String
 var _format_file : String
 
 var _names = {
@@ -40,51 +39,37 @@ var _names = {
 	FATAL: "FATAL"
 }
 
+# Can be overridden to define custom default values.
+func _enter_tree() -> void:
+	set_log_enabled(ProjectSettings.get_setting("plugins/logger/log_enabled", true))
+	set_default_output_enabled(ProjectSettings.get_setting("plugins/logger/default_output", false))
 
-func _init_setting(setting: String, value: Variant) -> Variant:
-	if ProjectSettings.has_setting(setting):
-		return ProjectSettings.get_setting(setting)
-	
-	ProjectSettings.set_setting(setting, value)
-	return value
+	_level = ProjectSettings.get_setting("plugins/logger/level", INFO | DEBUG | WARNING | ERROR | FATAL)
+
+	set_file_path(ProjectSettings.get_setting("plugins/logger/file/file_path", "res://game.log"))
+	set_file_write_enabled(ProjectSettings.get_setting("plugins/logger/file/log_file_write", true))
+
+	_format_default_output = ProjectSettings.get_setting("plugins/logger/default_output_format", "[{hour}:{minute}:{second}][{level}]{text}")
+	_format_file = ProjectSettings.get_setting("plugins/logger/file_format", "[{hour}:{minute}:{second}][{level}]{text}")
 
 
-func _init() -> void:
-	const LOGGER_SETTINGS = "editor_plugins/logger/" # Path to Log settings in Project Settings.
-	
-	set_log_enabled(_init_setting(LOGGER_SETTINGS + "log_enabled", true))
-	set_stdout_enabled(_init_setting(LOGGER_SETTINGS + "log_stdout", false))
-	
-	const LOGGER_SETTINGS_LEVEL = LOGGER_SETTINGS + "level"
-	
-	_level = _init_setting(LOGGER_SETTINGS_LEVEL, INFO | DEBUG | WARNING | ERROR | FATAL)
-	ProjectSettings.add_property_info(
-		{
-			"name": LOGGER_SETTINGS_LEVEL,
-			"type": TYPE_INT,
-			"hint": PROPERTY_HINT_FLAGS,
-			"hint_string": "Info,Debug,Warning,Error,Fatal",
-			}
-		)
-	
-	set_file_write_enabled(_init_setting(LOGGER_SETTINGS + "file/log_file_write", true))
-	set_file_path(_init_setting(LOGGER_SETTINGS + "file/file_path", "res://game.log"))
-	
-	_format_stdout = _init_setting(LOGGER_SETTINGS + "stdout_format", "[{hour}:{minute}:{second}][{level}]{text}")
-	_format_file = _init_setting(LOGGER_SETTINGS + "file_format", "[{hour}:{minute}:{second}][{level}]{text}")
+func _exit_tree() -> void:
+	_close_file()
 
-## Return [code]true[/code] if logger has level.
+## Return [param true] if logger has level.
 func has_level(level: int) -> bool:
 	return _names.has(level)
 
 ## Set the level enabled.
 func set_level(level: int, enabled: bool) -> void:
 	assert(has_level(level), "Invalid level.")
-	if has_level(level):
-		if enabled:
-			_level |= level
-		else:
-			_level &= ~level
+	if not has_level(level):
+		return
+
+	if enabled:
+		_level |= level
+	else:
+		_level &= ~level
 
 ## Add a custom log level. The level value must be unique and be greater than [member MAX].
 ## To call the custom level use [method message] method.
@@ -92,7 +77,7 @@ func add_level(level: int, name: String) -> void:
 	assert(not has_level(level), "Has level.")
 	assert(level > MAX and not level % 2, "Invalid level.")
 	assert(name, "Invalid name.")
-	
+
 	if not has_level(level) and level > MAX and not level % MAX and not name.is_empty():
 		_names[level] = name
 		set_level(level, true)
@@ -105,40 +90,44 @@ func get_level_name(level: int) -> String:
 func set_log_enabled(enabled: bool) -> void:
 	_log_enabled = enabled
 
-## Return [code]true[/code] if Log enabled.
+## Return [param true] if Log enabled.
 func is_log_enabled() -> bool:
 	return _log_enabled
 
-## Set stdout enabled.
-func set_stdout_enabled(enabled: bool) -> void:
-	_stdout_enabled = enabled
+## Set default output enabled.
+func set_default_output_enabled(enabled: bool) -> void:
+	_default_output_enabled = enabled
 
-## Return [code]true[/code] if stdout enabled.
-func is_stdout_enabled() -> bool:
-	return _stdout_enabled
+## Returns [param true] if default output is enabled.
+func is_default_output_enabled() -> bool:
+	return _default_output_enabled
 
 ## Set file write enabled.
 func set_file_write_enabled(enabled: bool) -> void:
-	if _file_write_enabled != enabled:
-		_file_write_enabled = enabled
-		
-		if enabled:
-			_open_file()
-		else:
-			_close_file()
+	if _file_write_enabled == enabled:
+		return
 
-## Returns [code]true[/code] if write to a file is enabled.
+	_file_write_enabled = enabled
+
+	if enabled:
+		_open_file()
+	else:
+		_close_file()
+
+## Returns [param true] if write to a file is enabled.
 func is_file_write_enabled() -> bool:
 	return _file_write_enabled
 
 ## Set the path to the log file.
 func set_file_path(path: String) -> void:
 	assert(path.is_absolute_path(), "Invalid path.")
-	if _file_path != path and path.is_absolute_path():
-		_file_path = path
-		
-		if is_file_write_enabled():
-			_open_file()
+	if not path.is_absolute_path() or _file_path == path:
+		return
+
+	_file_path = path
+
+	if is_file_write_enabled():
+		_open_file()
 
 ## Return path to log file.
 func get_file_path() -> String:
@@ -179,7 +168,7 @@ func format_file(message: Dictionary) -> String:
 
 ## Format string for editor output.
 func format_stdout(message: Dictionary) -> String:
-	return _format_stdout.format(
+	return _format_default_output.format(
 		{
 			"hour": "%02d" % message["hour"],
 			"minute":"%02d" % message["minute"],
@@ -193,30 +182,37 @@ func format_stdout(message: Dictionary) -> String:
 func message(level: int, text: String) -> void:
 	assert(has_level(level), "Has not level.")
 	assert(text, "Invalid message text.")
-	
+
 	if _log_enabled and _level & level:
-		var message = Time.get_time_dict_from_system()
+		var message : Dictionary = Time.get_time_dict_from_system()
 		message["level"] = level
+		message["level_name"] = _names[level]
 		message["text"] = text
-		
+
 		logged.emit(message)
-		
+
 		if _file_write_enabled:
 			_file.store_line(format_file(message))
-		
-		if _stdout_enabled:
+
+		if _default_output_enabled:
 			print(format_stdout(message))
 
 
-func _open_file() -> int:
-	if is_instance_valid(_file):
+func _open_file() -> void:
+	if is_instance_valid(_file) and _file.is_open():
 		_file.close()
-	
-	_file = File.new()
-	return _file.open(get_file_path(), File.WRITE)
+
+	_file = FileAccess.open(get_file_path(), FileAccess.WRITE)
+
+	var error := FileAccess.get_open_error()
+	if error:
+		return print_debug(error_string(error))
+
+	error = _file.get_error()
+	if error:
+		return print_debug(error_string(error))
 
 
 func _close_file() -> void:
-	if is_instance_valid(_file):
-		_file.close()
+	if is_instance_valid(_file) and _file.is_open():
 		_file = null
