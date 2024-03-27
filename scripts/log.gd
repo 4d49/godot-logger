@@ -214,4 +214,5 @@ static func _open_file() -> void:
 
 static func _close_file() -> void:
 	if is_instance_valid(_file) and _file.is_open():
+		_file.close()
 		_file = null
