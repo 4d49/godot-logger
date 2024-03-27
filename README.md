@@ -1,18 +1,20 @@
 # Godot-Log
 
-Simple in-game logger for Godot 4.0.
+Simple in-game logger for Godot 4.3.
 
 ![](https://user-images.githubusercontent.com/8208165/144706770-e4fda4c0-249b-4851-b7a8-8d0bc3d278bc.png)
 
 # Features
 - Installed as plugin.
-- Singleton Log.
-- Write to log file.
-- Disable log levels.
+- Static access to the `Log`.
+- Writing a log to a file.
+- Enable/Disable log levels.
 - Custom log levels.
+- Managing logging settings in `ProjectSettings`.
+- Customizing message output formatting.
 
 # Installation:
-1. Clone or download this repository to `addons` folder.
+1. `git clone` this repository to `addons` folder.
 2. Enable `Godot Log` in Plugins.
 3. Add `LogOutput` node to the scene.
 4. Profit.
@@ -54,7 +56,7 @@ Log.set_level(CUSTOM, true) # Enable custom level.
 ```
 
 # License
-Copyright (c) 2020-2023 Mansur Isaev and contributors
+Copyright (c) 2020-2024 Mansur Isaev and contributors
 
 Unless otherwise specified, files in this repository are licensed under the
 MIT license. See [LICENSE.md](LICENSE.md) for more information.
