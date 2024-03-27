@@ -18,24 +18,24 @@ func _def_settings(name: String, default: Variant) -> void:
 
 
 func _enter_tree() -> void:
-	_def_settings("plugins/logger/log_enabled", true)
-	_def_settings("plugins/logger/default_output", false)
+	_def_settings("plugins/log/log_enabled", true)
+	_def_settings("plugins/log/default_output", false)
 
-	_def_settings("plugins/logger/level", 31) # The magic number is - INFO | DEBUG | WARNING | ERROR | FATAL
+	_def_settings("plugins/log/level", 31) # The magic number is - INFO | DEBUG | WARNING | ERROR | FATAL
 	ProjectSettings.add_property_info(
 		{
-			"name": "plugins/logger/level",
+			"name": "plugins/log/level",
 			"type": TYPE_INT,
 			"hint": PROPERTY_HINT_FLAGS,
 			"hint_string": "Info,Debug,Warning,Error,Fatal",
 			}
 		)
 
-	_def_settings("plugins/logger/file/file_path", "res://game.log")
-	_def_settings("plugins/logger/file/log_file_write", true)
+	_def_settings("plugins/log/file/file_path", "res://game.log")
+	_def_settings("plugins/log/file/log_file_write", true)
 
-	_def_settings("plugins/logger/default_output_format", "[{hour}:{minute}:{second}][{level}]{text}")
-	_def_settings("plugins/logger/file_format", "[{hour}:{minute}:{second}][{level}]{text}")
+	_def_settings("plugins/log/default_output_format", "[{hour}:{minute}:{second}][{level}]{text}")
+	_def_settings("plugins/log/file_format", "[{hour}:{minute}:{second}][{level}]{text}")
 
 	add_custom_type(LOGGER_OUTPUT, "RichTextLabel", load(LOGGER_OUTPUT_SCRIPT), load(LOGGER_OUTPUT_ICON))
 

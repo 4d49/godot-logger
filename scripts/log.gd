@@ -44,16 +44,16 @@ static func _static_init() -> void:
 	# INFO: This is a workaround for creating a static signal.
 	_SELF.add_user_signal("logged", [{"name": "message", "type": TYPE_DICTIONARY}])
 
-	set_log_enabled(ProjectSettings.get_setting("plugins/logger/log_enabled", true))
-	set_default_output_enabled(ProjectSettings.get_setting("plugins/logger/default_output", false))
+	set_log_enabled(ProjectSettings.get_setting("plugins/log/log_enabled", true))
+	set_default_output_enabled(ProjectSettings.get_setting("plugins/log/default_output", false))
 
-	_level = ProjectSettings.get_setting("plugins/logger/level", INFO | DEBUG | WARNING | ERROR | FATAL)
+	_level = ProjectSettings.get_setting("plugins/log/level", INFO | DEBUG | WARNING | ERROR | FATAL)
 
-	set_file_path(ProjectSettings.get_setting("plugins/logger/file/file_path", "res://game.log"))
-	set_file_write_enabled(ProjectSettings.get_setting("plugins/logger/file/log_file_write", true))
+	set_file_path(ProjectSettings.get_setting("plugins/log/file/file_path", "res://game.log"))
+	set_file_write_enabled(ProjectSettings.get_setting("plugins/log/file/log_file_write", true))
 
-	_format_default_output = ProjectSettings.get_setting("plugins/logger/default_output_format", "[{hour}:{minute}:{second}][{level}]{text}")
-	_format_file = ProjectSettings.get_setting("plugins/logger/file_format", "[{hour}:{minute}:{second}][{level}]{text}")
+	_format_default_output = ProjectSettings.get_setting("plugins/log/default_output_format", "[{hour}:{minute}:{second}][{level}]{text}")
+	_format_file = ProjectSettings.get_setting("plugins/log/file_format", "[{hour}:{minute}:{second}][{level}]{text}")
 
 ## Return [param true] if logger has level.
 static func has_level(level: int) -> bool:
