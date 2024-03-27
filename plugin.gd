@@ -10,7 +10,7 @@ const AUTOLOAD_PATH = "res://addons/godot-logger/scripts/logger.gd"
 
 const LOGGER_OUTPUT = "LoggerOutput"
 const LOGGER_OUTPUT_SCRIPT = "res://addons/godot-logger/scripts/logger_output.gd"
-const LOGGER_OUTPUT_ICON = "res://addons/godot-logger/icons/logger.svg"
+const LOGGER_OUTPUT_ICON = "res://addons/godot-logger/icons/log_output.svg"
 
 
 func _def_settings(name: String, default: Variant) -> void:
