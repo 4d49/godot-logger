@@ -54,7 +54,7 @@ Log.set_level(CUSTOM, true) # Enable custom level.
 ```
 
 # License
-Copyright (c) 2020-2023 Mansur Isaev and contributors
+Copyright (c) 2020-2024 Mansur Isaev and contributors
 
 Unless otherwise specified, files in this repository are licensed under the
 MIT license. See [LICENSE.md](LICENSE.md) for more information.
